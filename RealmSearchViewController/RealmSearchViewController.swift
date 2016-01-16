@@ -16,37 +16,37 @@ import RealmSwift
 /// Method(s) to retrieve data from a data source
 public protocol RealmSearchResultsDataSource {
     /**
-    Called by the search view controller to retrieve the cell for display of a given object
-    
-    :param: searchViewController the search view controller instance
-    :param: anObject             the object to be displayed by the cell
-    :param: indexPath            the indexPath that the object resides at
-    
-    :return: instance of UITableViewCell that displays the object information
-    */
+     Called by the search view controller to retrieve the cell for display of a given object
+     
+     :param: searchViewController the search view controller instance
+     :param: anObject             the object to be displayed by the cell
+     :param: indexPath            the indexPath that the object resides at
+     
+     :return: instance of UITableViewCell that displays the object information
+     */
     func searchViewController(controller: RealmSearchViewController, cellForObject object: Object, atIndexPath indexPath: NSIndexPath) -> UITableViewCell
 }
 
 /**
-Method(s) to notify a delegate of ABFRealmSearchViewController events
-*/
+ Method(s) to notify a delegate of ABFRealmSearchViewController events
+ */
 public protocol RealmSearchResultsDelegate {
     /**
-    Called just before an object is selected from the search results table view
-    
-    :param: searchViewController the search view controller instance
-    :param: anObject             the object to be selected
-    :param: indexPath            the indexPath that the object resides at
-    */
+     Called just before an object is selected from the search results table view
+     
+     :param: searchViewController the search view controller instance
+     :param: anObject             the object to be selected
+     :param: indexPath            the indexPath that the object resides at
+     */
     func searchViewController(controller: RealmSearchViewController, willSelectObject anObject: Object, atIndexPath indexPath: NSIndexPath)
     
     /**
-    Called just when an object is selected from the search results table view
-    
-    :param: searchViewController the search view controller instance
-    :param: selectedObject       the selected object
-    :param: indexPath            the indexPath that the object resides at
-    */
+     Called just when an object is selected from the search results table view
+     
+     :param: searchViewController the search view controller instance
+     :param: selectedObject       the selected object
+     :param: indexPath            the indexPath that the object resides at
+     */
     func searchViewController(controller: RealmSearchViewController, didSelectObject anObject: Object, atIndexPath indexPath: NSIndexPath)
 }
 
@@ -134,17 +134,35 @@ public class RealmSearchViewController: UITableViewController, RealmSearchResult
     /// The configuration for the Realm in which the entity resides
     ///
     /// Default is [RLMRealmConfiguration defaultConfiguration]
+    //    public var realmConfiguration: Realm.Configuration {
+    //        set {
+    //            self.internalConfiguration = newValue
+    //        }
+    //        get {
+    //            if let configuration = self.internalConfiguration {
+    //                return configuration
+    //            }
+    //            
+    //            return Realm.Configuration.defaultConfiguration
+    //        }
+    //    }
+    
+    /// The configuration for the Realm in which the entity resides
+    ///
+    /// Default is [RLMRealmConfiguration defaultConfiguration]
     public var realmConfiguration: Realm.Configuration {
-        set {
-            self.internalConfiguration = newValue
-        }
-        get {
-            if let configuration = self.internalConfiguration {
-                return configuration
-            }
-            
-            return Realm.Configuration.defaultConfiguration
-        }
+        return  Realm.Configuration(
+            // Get the path to the bundled file
+            path: getRealmDataPath("meds"),
+            // Open the file in read-only mode as application bundles are not writeable
+            readOnly: false)
+    }
+    
+    func getRealmDataPath(realmFile: String) -> String {
+        let fileManager = NSFileManager.defaultManager()
+        let urls = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+        let realmFolderURL = urls.first!.URLByAppendingPathComponent("RealmData", isDirectory: true)
+        return realmFolderURL.URLByAppendingPathComponent("\(realmFile).realm").path!
     }
     
     /// The Realm in which the given entity resides in
